@@ -14,6 +14,7 @@
 
 ## 🚀 Installation
 git clone https://github.com/0xStarLabs/layer_zero_claimer_checker.git
+
 pip install -r requirements.txt
 
 
