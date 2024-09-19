@@ -10,11 +10,10 @@ class Checker:
         self.account = account
         self.session = requests.Session()
         if proxy:
-            if proxy:
-                self.session.proxies.update({
-                    'http': "http://" + proxy,
-                    'https': "http://" + proxy
-                })
+            self.session.proxies.update({
+                'http': "http://" + proxy,
+                'https': "http://" + proxy
+            })
 
     def check_eligible(self):
         url = f'https://www.layerzero.foundation/api/allocation/{self.account.address}'
