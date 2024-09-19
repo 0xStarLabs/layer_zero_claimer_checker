@@ -192,7 +192,6 @@ def send(account: Account, deposit_address, private_key):
 
 
 def process_account(private_key, deposit_address, proxy, i):
-    print(private_key, deposit_address, proxy)
     account = Account.from_key(private_key)
     logger.info(f"{i} | Checking {account.address} deposit to: {deposit_address}")
 
