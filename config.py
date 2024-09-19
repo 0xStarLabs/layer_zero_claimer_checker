@@ -1,6 +1,5 @@
-# Checker, Claim, Send
+# Withdraw, Claim, Send
 MODULES = [
-    "Checker",
     "Withdraw",
     "Claim",
     "Send"
