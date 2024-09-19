@@ -1,7 +1,6 @@
 ## Software for an automatic layer zero airdrop allocation claim, check and transfer.
 ## Софт для автоматического чека, клейма и траснфера аирдропа лейер зиро.
 
-## [SEE ENGLISH VERSION BELOW ](https://github.com/0xStarLabs/StarLabs-Twitter?tab=readme-ov-file#english-version)👇
 
 ## 🔗 Links
 [![Telegram channel](https://img.shields.io/endpoint?url=https://runkit.io/damiankrawczyk/telegram-badge/branches/master?url=https://t.me/StarLabsTech)](https://t.me/StarLabsTech)
