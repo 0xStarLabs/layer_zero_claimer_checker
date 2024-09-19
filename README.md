@@ -12,6 +12,26 @@
 
 💰 DONATION EVM ADDRESS: 0x620ea8b01607efdf3c74994391f86523acf6f9e1
 
+## 🤖 | Features :
+
+🟢 Checker
+
+🟢 Withdraw
+
+🟢 Claim
+
+🟢 Send
+
+## ⚙️ Config
+
+| Name | Description |
+| --- | --- |
+| Modules | Choose the modules you need. The checker will run by default. If you only need the checker, you can remove the rest. |
+| OKX_API_KEY | API key used to withdraw ETH from OKX. |
+| OKX_API_SECRET | API secret key used to withdraw ETH from OKX. |
+| OKX_API_PASSPHRASE | Passphrase for your OKX account. |
+
+
 ## 🚀 Installation
 git clone https://github.com/0xStarLabs/layer_zero_claimer_checker.git
 
