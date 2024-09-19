@@ -11,8 +11,8 @@ def read_wallets():
     with open("./data/private_keys.txt", 'r') as file:
         for line in file:
             key = line.strip()
-            if re.match(r'^0x[a-fA-F0-9]{64}$', key):
-                private_keys.append(key)
+            if re.match(r'^(0x)?[a-fA-F0-9]{64}$', key):
+                private_keys.append(key if key.startswith('0x') else '0x' + key)
             # else: consider logging invalid keys
 
     # Read and verify deposit addresses
