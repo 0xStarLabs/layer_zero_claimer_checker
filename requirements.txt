@@ -1,0 +1,5 @@
+ccxt==4.3.48
+loguru==0.7.2
+requests==2.31.0
+urllib3==2.1.0
+web3==6.11.2
