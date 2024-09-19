@@ -13,8 +13,11 @@ from common import read_wallets
 from concurrent.futures import ThreadPoolExecutor
 from constants import ERC20_ABI, ZRO_ABI, ZRO_DONATE_ABI, RPCS
 from config import OKX_API_KEY, OKX_API_SECRET, OKX_API_PASSPHRASE, MODULES
+import threading
 
-
+TOTAL_ZRO = 0
+PRIVATE_KEYS = []
+private_keys_lock = threading.Lock()  # Add this line
 token_contract_address = "0x6985884C4392D348587B19cb9eAAf157F13271cd"
 claim_contract_addresses = "0xB09F16F625B363875e39ADa56C03682088471523"
 donate_contract_address = "0xd6b6a6701303B5Ea36fa0eDf7389b562d8F894DB"
@@ -30,6 +33,11 @@ def configuration():
     logger.add(sys.stdout, colorize=True,
                format="<light-cyan>{time:HH:mm:ss}</light-cyan> | <level> {level: <8}</level> | - <white>{"
                       "message}</white>")
+
+def save_private_keys(private_keys):
+    with open("./data/unclaimed_private_keys.txt", "w") as file:
+        for key in private_keys:
+            file.write(key + "\n")
 
 rpc_cycle = cycle(RPCS)
 
@@ -194,7 +202,6 @@ def send(account: Account, deposit_address, private_key):
 def process_account(private_key, deposit_address, proxy, i):
     account = Account.from_key(private_key)
     logger.info(f"{i} | Checking {account.address} deposit to: {deposit_address}")
-
     checker = Checker(account, proxy)  # Checker class will handle None proxy
     amount, amount_wei, proof = checker.check_account()
     if amount_wei:
@@ -203,7 +210,11 @@ def process_account(private_key, deposit_address, proxy, i):
         amount_to_donate = get_amount_to_donate(amount_wei)
         amount_to_donate_ether = w3.from_wei(amount_to_donate, 'ether')
         balance_ether = check_balance(account.address)
-
+        global TOTAL_ZRO
+        with private_keys_lock:  # Use a lock when modifying shared resources
+            TOTAL_ZRO += amount
+            PRIVATE_KEYS.append(private_key)
+        
         if "Withdraw" in MODULES and balance_ether < amount_to_donate_ether:
             withdraw(account.address, amount_to_donate)
             time.sleep(random.randint(5, 10))
@@ -230,7 +241,9 @@ def main():
     # Use ThreadPoolExecutor to run tasks concurrently
     with ThreadPoolExecutor(max_workers=num_threads) as executor:
         executor.map(lambda x: process_account(*x[1], x[0]), tasks)
-
+    logger.success(f"Total ZRO: {TOTAL_ZRO}")
+    save_private_keys(PRIVATE_KEYS)
+    
 if __name__ == "__main__":
     configuration()
     main()
