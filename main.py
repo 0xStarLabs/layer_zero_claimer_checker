@@ -12,7 +12,7 @@ from checker import Checker
 from common import read_wallets
 from concurrent.futures import ThreadPoolExecutor
 from constants import ERC20_ABI, ZRO_ABI, ZRO_DONATE_ABI, RPCS
-from config import OKX_API_KEY, OKX_API_SECRET, OKX_API_PASSPHRASE, OKX_WITHDRAW
+from config import OKX_API_KEY, OKX_API_SECRET, OKX_API_PASSPHRASE, MODULES
 
 
 token_contract_address = "0x6985884C4392D348587B19cb9eAAf157F13271cd"
@@ -195,22 +195,28 @@ def process_account(private_key, deposit_address, proxy, i):
     print(private_key, deposit_address, proxy)
     account = Account.from_key(private_key)
     logger.info(f"{i} | Checking {account.address} deposit to: {deposit_address}")
-    checker = Checker(account, proxy)  # Checker class will handle None proxy
-    amount, amount_wei, proof = checker.check_account()
-    if amount_wei:
-        amount_wei = int(amount_wei)
-        logger.success(f"{i} | {account.address} Claiming {amount} ZRO")
-        amount_to_donate = get_amount_to_donate(amount_wei)
-        amount_to_donate_ether = w3.from_wei(amount_to_donate, 'ether')
-        balance_ether = check_balance(account.address)
-        if not OKX_WITHDRAW and balance_ether < amount_to_donate_ether:
-            logger.error(f"{i} | {account.address} | Not enough balance to donate. OKX Withdraw is disabled.")
-            return
-        withdraw(account.address, amount_to_donate)
-        time.sleep(random.randint(5, 10))
-        claim(account, private_key, amount_wei, amount_to_donate, proof)
-        time.sleep(random.randint(5, 10))
-        send(account, deposit_address, private_key)
+
+    if "Checker" in MODULES:
+        checker = Checker(account, proxy)  # Checker class will handle None proxy
+        amount, amount_wei, proof = checker.check_account()
+        if amount_wei:
+            amount_wei = int(amount_wei)
+            logger.success(f"{i} | {account.address} Claiming {amount} ZRO")
+            amount_to_donate = get_amount_to_donate(amount_wei)
+            amount_to_donate_ether = w3.from_wei(amount_to_donate, 'ether')
+            balance_ether = check_balance(account.address)
+
+            if "Withdraw" in MODULES and balance_ether < amount_to_donate_ether:
+                withdraw(account.address, amount_to_donate)
+                time.sleep(random.randint(5, 10))
+
+            if "Claim" in MODULES:
+                claim(account, private_key, amount_wei, amount_to_donate, proof)
+                time.sleep(random.randint(5, 10))
+
+            if "Send" in MODULES:
+                send(account, deposit_address, private_key)
+
     print('\n')
     time.sleep(random.randint(3, 5))
 
