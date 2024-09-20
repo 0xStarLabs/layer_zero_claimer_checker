@@ -22,29 +22,6 @@ class Checker:
             logger.error(f"Unexpected error in Checker initialization: {e}")
             raise
 
-    def check_eligible(self):
-        try:
-
-            url = f'https://www.layerzero.foundation/api/allocation/{self.account.address}'
-            response = self.session.get(url, headers=HEADERS)
-            response.raise_for_status()
-
-            response_json = response.json()
-            print(response_json)
-            if 'isEligible' in response_json:
-                return response_json['isEligible'], response_json['zroAllocation']['asString'], response_json['zroAllocation']['asBigInt']
-            elif response_json.get('error') == 'Record not found':
-                return False, None, None
-            else:
-                logger.error(f'check_eligible: Unexpected Response: {response.text}')
-                return False, None, None
-        except requests.exceptions.RequestException as e:
-            logger.error(f'check_eligible: Request error: {e}')
-            return False, None, None
-        except Exception as e:
-            logger.error(f'check_eligible: Unexpected error: {e}')
-            return False, None, None
-        
     # def check_claimed_amount(self):
     #     try:
     #         url = choice(RPCS)
