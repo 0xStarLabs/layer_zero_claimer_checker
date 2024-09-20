@@ -203,16 +203,17 @@ def process_account(private_key, deposit_address, proxy, i):
     account = Account.from_key(private_key)
     logger.info(f"{i} | Checking {account.address} deposit to: {deposit_address}")
     checker = Checker(account, proxy)  # Checker class will handle None proxy
-    amount, amount_wei, proof = checker.check_account()
-    if amount_wei:
-        amount_wei = int(amount_wei)
-        logger.success(f"{i} | {account.address} Claiming {amount} ZRO")
-        amount_to_donate = get_amount_to_donate(amount_wei)
+    proof, amount_1, amount_2 = checker.get_proof()
+    if proof:
+        amount_2 = int(amount_2)
+        amount_2_ether = w3.from_wei(amount_2, 'ether')
+        logger.success(f"{i} | {account.address} Claiming {amount_2_ether} ZRO")
+        amount_to_donate = get_amount_to_donate(amount_2)
         amount_to_donate_ether = w3.from_wei(amount_to_donate, 'ether')
         balance_ether = check_balance(account.address)
         global TOTAL_ZRO
         with private_keys_lock:  # Use a lock when modifying shared resources
-            TOTAL_ZRO += amount
+            TOTAL_ZRO += amount_2_ether
             PRIVATE_KEYS.append(private_key)
         
         if "Withdraw" in MODULES and balance_ether < amount_to_donate_ether:
@@ -220,12 +221,12 @@ def process_account(private_key, deposit_address, proxy, i):
             time.sleep(random.randint(5, 10))
 
         if "Claim" in MODULES:
-            claim(account, private_key, amount_wei, amount_to_donate, proof)
+            claim(account, private_key, amount_2, amount_to_donate, proof)
             time.sleep(random.randint(5, 10))
 
         if "Send" in MODULES:
             send(account, deposit_address, private_key)
-
+    
     print('\n')
     time.sleep(random.randint(3, 5))
 
@@ -243,7 +244,7 @@ def main():
         executor.map(lambda x: process_account(*x[1], x[0]), tasks)
     logger.success(f"Total ZRO: {TOTAL_ZRO}")
     save_private_keys(PRIVATE_KEYS)
-    
+
 if __name__ == "__main__":
     configuration()
     main()
