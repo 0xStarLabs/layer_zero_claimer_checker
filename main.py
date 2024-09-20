@@ -232,7 +232,7 @@ def process_account(private_key, deposit_address, proxy, i):
 
 def main():
     private_keys, deposit_addresses, proxies = read_wallets()
-    logger.success(f"Loaded Private Keys: {len(private_keys)} | Deposit Addresses: {len(deposit_addresses)} | Proxies: {len(proxies)}")
+    logger.success(f"Loaded Private Keys: {len(private_keys)} | Deposit Addresses: {len(deposit_addresses)}")
     num_threads = int(input("Enter the number of threads to use: "))
 
     # Create a list of tasks
