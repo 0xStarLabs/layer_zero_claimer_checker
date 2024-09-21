@@ -211,7 +211,7 @@ def process_account(private_key, deposit_address, proxy, i):
         amount_2_ether = w3.from_wei(amount_2, 'ether')
         logger.success(f"{i} | {account.address} Claiming {amount_2_ether} ZRO")
         amount_to_donate = get_amount_to_donate(amount_2)
-        amount_to_donate_buffer = int(amount_to_donate * 1.02)
+        amount_to_donate_buffer = int(amount_to_donate * 1.05)
         amount_to_donate_ether = w3.from_wei(amount_to_donate_buffer, 'ether')
         balance_ether = check_balance(account.address)
         global TOTAL_ZRO
@@ -224,7 +224,7 @@ def process_account(private_key, deposit_address, proxy, i):
             time.sleep(random.randint(5, 10))
 
         if "Claim" in MODULES:
-            claim(account, private_key, amount_full, amount_to_donate, proof)
+            claim(account, private_key, amount_full, amount_to_donate_buffer, proof)
             time.sleep(random.randint(5, 10))
 
         if "Send" in MODULES:
