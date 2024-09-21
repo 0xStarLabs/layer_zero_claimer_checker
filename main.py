@@ -205,11 +205,14 @@ def process_account(private_key, deposit_address, proxy, i):
     checker = Checker(account, proxy)  # Checker class will handle None proxy
     proof, amount_1, amount_2 = checker.get_proof()
     if proof:
+        amount_1 = int(amount_1)
         amount_2 = int(amount_2)
+        amount_full = int(amount_1 + amount_2)
         amount_2_ether = w3.from_wei(amount_2, 'ether')
         logger.success(f"{i} | {account.address} Claiming {amount_2_ether} ZRO")
         amount_to_donate = get_amount_to_donate(amount_2)
-        amount_to_donate_ether = w3.from_wei(amount_to_donate, 'ether')
+        amount_to_donate_buffer = int(amount_to_donate * 1.02)
+        amount_to_donate_ether = w3.from_wei(amount_to_donate_buffer, 'ether')
         balance_ether = check_balance(account.address)
         global TOTAL_ZRO
         with private_keys_lock:  # Use a lock when modifying shared resources
@@ -221,7 +224,7 @@ def process_account(private_key, deposit_address, proxy, i):
             time.sleep(random.randint(5, 10))
 
         if "Claim" in MODULES:
-            claim(account, private_key, amount_2, amount_to_donate, proof)
+            claim(account, private_key, amount_full, amount_to_donate, proof)
             time.sleep(random.randint(5, 10))
 
         if "Send" in MODULES:
